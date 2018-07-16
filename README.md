@@ -24,23 +24,33 @@ Once installed and connected, the Dash Display will monitor the CAN communicatio
 The PUT NAME HERE display hardware has 3 touch-pad buttons along the lower edge of the OLED display.  Pressing the LEFT button will cycle between battery information and its associated charging sources.  Pressing the RIGHT button will cycle between different batteries in your system.  After a period of inactivity the display may darken.  You can awaken the dash display by pressing the CENTER button
 
 <br>
-###Information displayed:
-#####The following battery information may be displayed:
+###Information displayed
+####The following battery information may be displayed:
 - Battery Name / ID number
 - Battery Voltage, Current, Temperature
 - Battery SOC
 
- ----- PUT INSOME SAMPLE PHOTOS
+<p align="center">
+<img src="House Bat 1.JPG">
+</p> 
 
-<br>
-#####The following Charging Source information may be displayed:
+<p align="center">
+<img src="House Bat 2.JPG">
+</p> 
+
+
+<br><br><br>
+####The following Charging Source information may be displayed:
 - Voltage at charging source
 - Current being delivered by charging source
 - Temperature of charging source
 - % capability of charging source presently be utilized.
 - Charging mode
 
- ----- PUT INSOME SAMPLE PHOTOS
+<p align="center">
+<img src="Charger 1.JPG">
+</p> 
+
 
 Note that not all information may be available, depending on the capabilities of the associated device(s) installed in your system.  For example, if you only have a VSR Alternator Regulator installed battery SOC will not be shown.  To see Battery SOC you will need to install something which actually tracks SOC over the long term, such as a proper Battery Monitor or BMS.
 
