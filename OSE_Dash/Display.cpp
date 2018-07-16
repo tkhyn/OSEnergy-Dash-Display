@@ -318,11 +318,10 @@ void  update_display(void) {
     if (batFocus == -1) {                                                   // After looking, is there no battery to dsiplay? (Batfocus is STILL == -1!)
         u8g2.clearBuffer();           
         u8g2.setFont(u8g2_font_ncenB08_tr);
-        u8g2.drawStr(25,10, "OSEnergy Dash");
+        u8g2.drawStr(23,10, "OSEnergy Dash");
         //u8g2.drawStr(50,20, "Display");
         u8g2.setFont(u8g2_font_ncenB10_tr);
-        u8g2.drawStr(20,45, "No Batteries");
-        u8g2.drawStr(40,60, "Found");
+        u8g2.drawStr(25,40, "Searching");
         u8g2.sendBuffer();                    
         
         return;   
