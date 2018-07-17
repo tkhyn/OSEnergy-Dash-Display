@@ -69,9 +69,10 @@
 
             // -----  If attached, the following IRQs are used to wake-up the display from a deep-sleep power-saving mode.
 //#define KP_LEFT_IRQ     INT2
-#define KP_CENTER_IRQ   INT2                        // Hardware at present only has CENTER key connected to INT capable port.
+  #define KP_CENTER_IRQ   INT2                        // Hardware at present only has CENTER key connected to INT capable port.
 //#define KP_RIGHT_IRQ    INT2
-//#define CAN_Rx_IRQ      INT2               
+  #define CAN_Rx_IRQ      INT0                        // Connected to Can Rx signal,   make sure to MASK this in normal operation - else might swamp CPU with IRQs.
+                
 
 
 

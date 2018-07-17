@@ -57,48 +57,13 @@ bool showingError = false;                              // Is there an error or 
 
 bool init_display(void) {
 
-    
-    //---  Enable IRQs for the touch screen keypads /  CAN activity soo that they can be used to awaken the CPU from a SLEEP state
-    //         See OSE_dash.h to define which IRQ ports are actualy enabled by hardware.
-    
-    #ifdef KP_LEFT_IRQ
-        attachInterrupt (KP_LEFT_IRQ,   dummy_IRQ, FALLING);                           
-        #endif
-    #ifdef KP_CENTER_IRQ
-        attachInterrupt (KP_CENTER_IRQ, dummy_IRQ, FALLING);                             
-        #endif
-    #ifdef KP_RIGHT_IRQ
-        attachInterrupt (KP_RIGHT_IRQ, dummy_IRQ, FALLING);                                 
-        #endif
-    #ifdef CAN_Rx_IRQ
-        attachInterrupt (CAN_Rx_IRQ,   dummy_IRQ, FALLING);                                
-        #endif
-        
-                
+                 
 
 
     u8g2.begin(KP_CENTER_PORT, KP_RIGHT_PORT, KP_LEFT_PORT, U8X8_PIN_NONE, U8X8_PIN_NONE, U8X8_PIN_NONE);
     u8g2.setFlipMode(0);                                    // making sure it rotate the right way.
 
 }
-
-
-
-
-
-
-
-//------------------------------------------------------------------------------------------------------
-// Dummy IRQ Handler
-//      Just a place for the keypad IRQs to attach to.  We do nothing here, as the purpose of the IRQ is to
-//      allow the CPU to be takes out of SLEEP mode.  (Plus, the u8g2 lib may well reassign the IRQs itself.
-//
-//------------------------------------------------------------------------------------------------------
-
-void dummy_IRQ(void) {
-
-}
-
 
 
 

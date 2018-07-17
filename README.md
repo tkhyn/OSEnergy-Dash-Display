@@ -62,6 +62,15 @@ Note that not all information may be available, depending on the capabilities of
 
 
   
+<br><br>
+####Source code notes:
+Download and compile using the Arduino IDE.  Make sure to install the ATmega64M1 CPU type as well as the AVR_CAN and RV-C libraries:
+
+https://github.com/thomasonw/ATmegaxxM1-C1
+https://github.com/thomasonw/avr_can
+https://github.com/thomasonw/RV-C
+
+
 
 
 

@@ -149,6 +149,7 @@ void  handle_sleep_states(void) {
         
 
         //-- Put CPU into a sleep mode, wait for an IRQ from the CAN or the user pressing a button to wake is up.
+        //        
       
         //---   Power down the subsystems as they will not be used while sleeping.
         CAN_sleep(true);                                            // Put CAN subsystem into sleep mode;
@@ -159,7 +160,24 @@ void  handle_sleep_states(void) {
         power_spi_disable();
         power_timer0_disable();
         power_timer1_disable();
+
+
+
+        //---  Enable IRQs for the touch screen keypads /  CAN Rx activity so that they can be used to awaken the CPU from a SLEEP state
+        //         See OSE_dash.h to define which IRQ ports are actualy enabled by hardware.
         
+        #ifdef KP_LEFT_IRQ
+            attachInterrupt (KP_LEFT_IRQ,   dummy_IRQ, FALLING);                           
+            #endif
+        #ifdef KP_CENTER_IRQ
+            attachInterrupt (KP_CENTER_IRQ, dummy_IRQ, FALLING);                             
+            #endif
+        #ifdef KP_RIGHT_IRQ
+            attachInterrupt (KP_RIGHT_IRQ, dummy_IRQ, FALLING);                                 
+            #endif
+        #ifdef CAN_Rx_IRQ
+            attachInterrupt (CAN_Rx_IRQ,   dummy_IRQ, FALLING);                                
+            #endif
 
         
         //---   This will actualy place the CPU into a sleep state, while assuring IRQs are not missed.
@@ -173,12 +191,31 @@ void  handle_sleep_states(void) {
         sei();
 
 
-        //----  CPE has awaken after receving an IRQ        
+        //----  CPE has awaken after receving an IRQ   
+        //---  Detach external IRQs, so the CPU does not get swamped with requests.  (Most notably, the CAN Rx IRQ)
+        //
+        #ifdef KP_LEFT_IRQ
+            detachInterrupt (KP_LEFT_IRQ);                        
+            #endif
+        #ifdef KP_CENTER_IRQ
+            detachInterrupt (KP_CENTER_IRQ);                             
+            #endif
+        #ifdef KP_RIGHT_IRQ
+            detachInterrupt (KP_RIGHT_IRQ);                                 
+            #endif
+        #ifdef CAN_Rx_IRQ
+            detachInterrupt (CAN_Rx_IRQ);                                
+            #endif
+
+
+
+        //---   Power-back up needed subsystems.     
         power_adc_enable();
-        power_can_enable();                    //!! HEY!!  HUM, CANN I DO THIS, OR DO I NEED TO ELAVE IT RUNNING???  Do I need to reinit the CAN?
+        power_can_enable();                    //!! HEY!!  HUM, CANN I DO THIS, OR DO I NEED TO LEAVE IT RUNNING???  Do I need to reinit the CAN?
         power_spi_enable();
         power_timer0_enable();
         power_timer1_enable();
+
 
 
         last_CAN_activity  = millis();                              // Timer chip has been restarted, need to re-establish baseline timeput values
@@ -192,6 +229,19 @@ void  handle_sleep_states(void) {
 
 
 
+
+
+
+//------------------------------------------------------------------------------------------------------
+// Dummy IRQ Handler
+//      Just a place for the keypad IRQs to attach to.  We do nothing here, as the purpose of the IRQ is to
+//      allow the CPU to be takes out of SLEEP mode.  (Plus, the u8g2 lib may well reassign the IRQs itself.
+//
+//------------------------------------------------------------------------------------------------------
+
+void dummy_IRQ(void) {
+
+}
 
 
 
