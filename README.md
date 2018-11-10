@@ -17,7 +17,7 @@ Insert Photo of finished device
 <br><br>
 ###Usage:
 
-Once installed and connected, the Dash Display will monitor the CAN communications bus looking for battery information as well as any chargers associated with that battery.  Up to 4x different batteries may be monitored at one time, as well as up to 10x different charging sources.  When 1st powered up the display will show the 'No batteries Found' message; as battery information is found it will change the display to reflect the battery as well as any charging source associated with that battery.
+Once installed and connected, the Dash Display will monitor the CAN communications bus looking for battery information as well as any chargers associated with that battery.  Up to 4x different batteries may be monitored at one time, as well as up to 10x different charging sources.  When 1st powered up the display will show a  'Searching' message; as battery information is found it will change the display to reflect the battery as well as any charging source associated with that battery.
 
 
 
