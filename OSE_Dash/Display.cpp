@@ -390,7 +390,7 @@ void    show_battery(unsigned index, bool extended) {
     if ((millis() - batteries[index].volts.timestamp) < BAT_STATUS_TIMEOUT) {               // Valid timestamp?   
         u8g2.setFont(u8g2_font_ncenB24_tr);
         u8g2.setCursor(19,45);
-        u8g2.print((batteries[index].volts.value + 0.05),1);                                // Make sure to 'round up'
+        u8g2.print(batteries[index].volts.value,1);                               
         u8g2.setFont(u8g2_font_ncenB10_tr);
         u8g2.print("V");
         }
@@ -400,7 +400,7 @@ void    show_battery(unsigned index, bool extended) {
     u8g2.setFont(u8g2_font_ncenB10_tr);
     u8g2.setCursor(8,64);     
     if ((millis() - batteries[index].amps.timestamp) < BAT_STATUS_TIMEOUT)
-        u8g2.print((batteries[index].amps.value + 0.05),1);
+        u8g2.print(batteries[index].amps.value,(batteries[index].amps.value >= 100.0)?0:1);
     else
         u8g2.print("---");
     u8g2.setFont(u8g2_font_5x7_tr);   
@@ -495,7 +495,7 @@ void    show_charger(unsigned index, bool extended) {
     u8g2.setFont(u8g2_font_ncenB12_tr);
     u8g2.setCursor(5,28);
     u8g2.print("Volts:   ");
-    u8g2.print((chargers[index].Vdc.value + 0.05),1);
+    u8g2.print(chargers[index].Vdc.value,1);
     
     u8g2.setCursor(5,46);
     u8g2.print("Amps:   ");
@@ -503,7 +503,7 @@ void    show_charger(unsigned index, bool extended) {
 
     
     if ((millis() - chargers[index].Adc.timestamp) < CHARGER_STATUS_TIMEOUT) 
-        u8g2.print((chargers[index].Adc.value + 0.05),1);
+        u8g2.print(chargers[index].Adc.value,(chargers[index].Adc.value >= 100.0)?0:1);
     else
         u8g2.print("   ---");
 
