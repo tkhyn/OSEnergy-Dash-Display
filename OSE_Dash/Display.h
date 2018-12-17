@@ -31,6 +31,7 @@ bool    init_display(void);
 void    update_display(void); 
 void    handle_keypad(void);
 void    display_sleep(bool sleep);
+bool   display_sleeping(void);
 
 extern bool showingError;
 

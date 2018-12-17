@@ -24,6 +24,8 @@
                                                
 #include "OSE_Dash.h"
 #include "Display.h"
+#include "CAN_handler.h"
+
 
 #include <U8g2lib.h>
 
@@ -42,6 +44,7 @@ U8G2_SH1106_128X64_WINSTAR_F_4W_HW_SPI u8g2(U8G2_R0, /* cs=*/ 11, /* dc=*/ 12, U
 bool showingError = false;                              // Is there an error or Fault message on the display?  
                                                         // If so, do nothing more until user presses a button to clear it.
                                                         
+bool displaySleeping = false;                           // Is the display sleeping?  (Dark, and in lower-power state)
 
 
 
@@ -82,6 +85,8 @@ bool init_display(void) {
 
 void    display_sleep(bool sleep) {
 
+    displaySleeping = sleep;
+    
     if (sleep)                              //-- Turn off the OLED display
         u8g2.setPowerSave(1);
     else
@@ -90,8 +95,20 @@ void    display_sleep(bool sleep) {
                
 }
 
+//------------------------------------------------------------------------------------------------------
+//
+//  Display Sleeping
+//      Returned current display mode, if it is awake or sleeping.  
+//
+//
+//
+//------------------------------------------------------------------------------------------------------
 
+bool display_sleeping(void) {
 
+    return (displaySleeping);
+    
+}
 
 
 
@@ -121,6 +138,7 @@ void handle_keypad(void) {
             c = Serial.read();
             if (c == 'l')   key = U8X8_MSG_GPIO_MENU_PREV;
             if (c == 'r')   key = U8X8_MSG_GPIO_MENU_NEXT;
+            CAN_status_request();    
             }
         #endif
         
@@ -151,7 +169,9 @@ void handle_keypad(void) {
                                         break;                                      // All done, we will now display this new battery.
                                     }
     
-                                break;
+                                 CAN_status_request();                              // Any time user presses a button, send a request for data - just to make sure
+                                                                                    // everyone on the OSEnergy bus is awake!
+                                 break;
     
                                 
     
@@ -172,13 +192,18 @@ void handle_keypad(void) {
            
                                if (chargerFocus != i)                               // Did we find a new charger to look at?
                                     chargerFocus = -1;                              // Nope. Go back to showing BAT info.
-                                    
+ 
+                                CAN_status_request();    
                                 break;                                        
     
     
     
     
             case U8X8_MSG_GPIO_MENU_SELECT:                                         // Center keypad
+                                CAN_status_request();
+                                break;
+
+                                
             case U8X8_MSG_GPIO_MENU_HOME:
             case U8X8_MSG_GPIO_MENU_UP:
             case U8X8_MSG_GPIO_MENU_DOWN:
@@ -250,10 +275,13 @@ void  update_display(void) {
 
 
     //---   Has what we were looking at expired?
-    if ((batFocus != -1) && ((millis() - batteries[batFocus].volts.timestamp) >= BAT_STATUS_TIMEOUT))                   // Battery expired?
+    if ((batFocus != -1) && ((millis() - batteries[batFocus].volts.timestamp) >= BAT_STATUS_TIMEOUT)) {                     // Battery expired?
         batFocus = -1;
+    }
+      
+ 
 
-    if ((chargerFocus != -1) && ((millis() - chargers[chargerFocus].Vdc.timestamp) >= CHARGER_STATUS_TIMEOUT))                    // Charger expired?
+    if ((chargerFocus != -1) && ((millis() - chargers[chargerFocus].Vdc.timestamp) >= CHARGER_STATUS_TIMEOUT))              // Charger expired?
         chargerFocus = -1;
             
 
@@ -362,7 +390,7 @@ void    show_battery(unsigned index, bool extended) {
     if ((millis() - batteries[index].volts.timestamp) < BAT_STATUS_TIMEOUT) {               // Valid timestamp?   
         u8g2.setFont(u8g2_font_ncenB24_tr);
         u8g2.setCursor(19,45);
-        u8g2.print(batteries[index].volts.value,1);
+        u8g2.print((batteries[index].volts.value + 0.05),1);                                // Make sure to 'round up'
         u8g2.setFont(u8g2_font_ncenB10_tr);
         u8g2.print("V");
         }
@@ -372,7 +400,7 @@ void    show_battery(unsigned index, bool extended) {
     u8g2.setFont(u8g2_font_ncenB10_tr);
     u8g2.setCursor(8,64);     
     if ((millis() - batteries[index].amps.timestamp) < BAT_STATUS_TIMEOUT)
-        u8g2.print(batteries[index].amps.value,1);
+        u8g2.print((batteries[index].amps.value + 0.05),1);
     else
         u8g2.print("---");
     u8g2.setFont(u8g2_font_5x7_tr);   
@@ -467,7 +495,7 @@ void    show_charger(unsigned index, bool extended) {
     u8g2.setFont(u8g2_font_ncenB12_tr);
     u8g2.setCursor(5,28);
     u8g2.print("Volts:   ");
-    u8g2.print(chargers[index].Vdc.value,1);
+    u8g2.print((chargers[index].Vdc.value + 0.05),1);
     
     u8g2.setCursor(5,46);
     u8g2.print("Amps:   ");
@@ -475,7 +503,7 @@ void    show_charger(unsigned index, bool extended) {
 
     
     if ((millis() - chargers[index].Adc.timestamp) < CHARGER_STATUS_TIMEOUT) 
-        u8g2.print(chargers[index].Adc.value,1);
+        u8g2.print((chargers[index].Adc.value + 0.05),1);
     else
         u8g2.print("   ---");
 

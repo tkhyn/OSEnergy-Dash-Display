@@ -10,6 +10,13 @@ The OSEnergy Dashboard Display is a combination of hardware and software and des
 ###How to Purchase and Install
 The OSEnergy-Dash-Display source code has been proofed on the PUT NAME HERE AS WELL AS LINK open xxxx.  You can purchase a preassembled version complete with firmware installed here: link-here.
 
+The raw display is sold by this person:  [https://www.tindie.com/stores/geraldjust/](https://www.tindie.com/stores/geraldjust/#store-section-products) 
+
+The addaptor board gbr files are in this GitHub, or you can order some from  [OSHPARK](https://oshpark.com/shared_projects/Y1xcmnih) 
+
+Firmware is in this Github, program the display using an FTDI cable.
+
+
 Insert Photo of finished device
 
 

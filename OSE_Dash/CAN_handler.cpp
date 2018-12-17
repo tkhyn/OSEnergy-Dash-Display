@@ -47,7 +47,7 @@
     void RVCChrgStat_handler   (const tN2kMsg &N2kMsg);
     void RVCChrgStat2_handler  (const tN2kMsg &N2kMsg);
     void ISODiagnostics_handler(const tN2kMsg &N2kMsg);
-
+    void N2KProdInfo_handler   (const tN2kMsg &N2kMsg);
             
     tCANHandlers CANHandlers[]={
         {0x1FFFD,&RVCDCStatus1_handler},
@@ -61,6 +61,7 @@
         {0x1FEA3,&RVCChrgStat2_handler},            // Official PGN number
         {0x1FF9D,&RVCChrgStat2_handler},            // Old 'Temp' one used until we were assigned the real number...  (For backwars compatability with existing field devices.)
         {0x1FECA,&ISODiagnostics_handler},
+        {126996L,&N2KProdInfo_handler},             // Contains device name.
         
         {0,NULL}                                                                               // ----PGN of 0 indicates end of table----
         };
@@ -69,6 +70,9 @@
 
 
 
+//----  Local prototypes
+
+void  init_datastores(void);
 
 
 
@@ -108,7 +112,7 @@ bool init_CAN(void) {
                                                                 
     init_datastores();                                          // Clear out the datastores, getting them ready to recevie data.
     CAN_status_request();                                       // Send out requests for data, in case we need to wake up the CAN bus!
-        
+       
 }
 
 
@@ -158,7 +162,7 @@ void    CAN_sleep(bool sleep) {
  
         digitalWrite(CAN_STBY_PORT, LOW);                               // Put transeiver into full-power mode.
         
-        delay(100);                                                     // Give some time for the sybsystem to wake up.  
+        delay(100);                                                     // Give some time for the subsystem to wake up.  
                                                     //!! HEY!!  DO I NEED THIS DELAY???  IS IT THE CORRECT VALUE???
                                                     
     }
@@ -193,8 +197,6 @@ void init_datastores(void) {
         chargers[i].errorYellow = false;
         chargers[i].deviceName[0] = NULL;
         }
-
-    CAN_status_request();                                       // Broadcast a request for status, see if we need to wake someone up.
 
     batFocus = -1;
     chargerFocus = -1;                                          // Reset indexes of what to show.
@@ -276,8 +278,15 @@ void CAN_status_request(void) {
     packet.data.bytes[1]  =  0xFF;
     packet.data.bytes[2]  =  0x01;
 
-    Can0.sendFrame(packet);            
+    Can0.sendFrame(packet);   
 
+    delay(20);
+
+    Can0.sendFrame(packet);                                                         // Send packet a 2nd time, incase devices were sleeping and missed the 1st one.
+                                                                                    //  (Sleeping devices will be awoken via CAN activity, but are not able to process
+                                                                                    //   the message.  The 1st packet shoudl wake up anyone snoozing away, and the 
+                                                                                    //   2nd will then be able to be recevied and processed)
+                                                                                    
 }
 
 
@@ -293,7 +302,7 @@ void CAN_status_request(void) {
 //
 //
 //!! HEY!!  Add capability to request (and recevie) NEMA2000 PGN126996 (Product Informaiton).
-//          In there is the device name string suer has set!
+//          In there is the device name string user has set!
 //          But do note, this is a multi-packet message, so some handler will need to be added....
 //!! HEY!!  Maybe a BETTER alterantive is to fix the regulator so taht it can send multi-packet J1939 messages,
 //          then send out a proper RV-C 65259 (FEEBh) "Product identification message", using the MODEL as
@@ -757,6 +766,54 @@ void ISODiagnostics_handler(const tN2kMsg &N2kMsg) {
 }
 
     
+
+//*****************************************************************************
+void N2KProdInfo_handler(const tN2kMsg &N2kMsg){                                           // NMEA2000 'Product Informaiton', contains the device name!
+        
+
+
+  int i;
+    
+
+
+ unsigned short Version;
+ unsigned short ProductCode;
+ char ModelID[20];                          // This is the 'name' of the device!
+ char SwCode[20];                           // Contains Firmware Version string
+ char ModelVersion[10];                    // Hardware version number
+ char ModelSerialCode[10];                 // Serial number
+ unsigned char CertificationLevel; 
+ unsigned char LoadEquivalency;
+
+ 
+        // Not so easy, this is a multi-packet message, so we will have to receive and parse it!  Awk...
+        //
+        
+                     
+/*                 
+
+    if (ParseN2kPGN126996(N2kMsg,Version,ProductCode,
+                         sizeof(ModelID),ModelID,sizeof(SwCode),SwCode,
+                         sizeof(ModelVersion),ModelVersion,sizeof(ModelSerialCode),ModelSerialCode,
+                         CertificationLevel,LoadEquivalency) ) {
+
+
+        i = findChargerStash(N2kMsg);
+        if (i == -1) return;                                                                // The charger datastash is filled up.
+         
+
+
+        //--        OK, have a place to put this info into, now -  pull out the new data we received and put it into the datastore.
+
+
+                            
+     }
+*/
+
+
+     
+}
+
 
 
 

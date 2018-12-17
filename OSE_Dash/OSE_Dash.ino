@@ -122,6 +122,14 @@ void setup() {
 void  handle_sleep_states(void) {
 
 
+//!! HEY!!!  Be smarter about when to go to sleep.  30 second timeout is OK, but maybe if
+//      user has pressed into a detail screen stay awake until the move back to the top level.
+//      Also, maybe if we are tracking a shore-powered or engien power charing soruce, just leave
+//      display active???
+//      OR  consdier:  Maybe always leave the dispay active until the user presses the RIGHT key to cycle off
+//      the end of the known batteries...
+//
+
 
     //---   First we check to see if the display should be darkened.
     //
@@ -222,7 +230,7 @@ void  handle_sleep_states(void) {
         last_USER_activity = millis();
         
         init_CAN();                                                 // Wake up  and make sure CAN is properly initalized.  
-                                                                    // Will clear datastores and broadcast request for statuses as well.
+                                                                    // Will clear datastores and broadcast request RBMs for statuses as well.
         display_sleep(false);                                       // Wake up the display.                                                            
         }
 }
@@ -262,14 +270,19 @@ void dummy_IRQ(void) {
 void loop() {
 
 
-//!! HEY!!!  MIGHT have to put someting in there that sends out REQUEST for data, in case all the devices are asleep.
-//          This would play out for example when the user pushes the button to wake this display up, we would want to see out say a 'DC_STATUS1' request to wake up 
-//          anyone out there.
-//          We might have to keep sending them, just to keep things awake as long as we have the display lit.
+    //!! HEY!!!  NOT SURE I REALLY NEED THIS!!!
+    /*
+    uint32_t static last_RBM_request = 0;
+    
 
+     if (((millis() - last_RBM_request)  >= (45*60*1000UL)) &&      // Incase there are no active chargers present, --AND--
+         (display_sleeping() == false)) {                           // we are not in a semi-sleep mode 
+        CAN_status_request();                                       //   send out a DC-Status4 requestevery 45 seconds to keep all RBMs from going to sleep.
+        last_RBM_request = millis();
+        }
+        */
 
-
-
+        
 
     process_CAN_Messages();                                         // Fetch and process any incomming CAN messages
 
@@ -281,28 +294,6 @@ void loop() {
 
     
     handle_sleep_states();                                          // See if we should blank the display and/or go into sleep mode due to inactivity on CAN bus.
-
-
-
-
-
-
-/*
-for (int i=0; i< MAX_BATTERIES; i++) {
-    if (batteries[i].batID == 0xff) continue;
-    if ((millis() - batteries[i].volts.timestamp) >= 1000UL)  continue;          // Ignore old data.
-      
-    Serial.print("  I = ");  Serial.print(i);
-    Serial.print("  Battery ID");  Serial.print(batteries[i].batID);
-    Serial.print("  Volts = ");    Serial.print(batteries[i].volts.value);
-    Serial.print("  Amps = ");    Serial.print(batteries[i].amps.value);
-    Serial.println();
-
-}
-  */
-
-    
-
 
 
 }

@@ -29,7 +29,6 @@
 //  Prototypes
 bool  init_CAN(void);
 void  process_CAN_Messages(void);  
-void  init_datastores(void);
 void  purge_datastash(void);
 void  CAN_status_request(void);
 void  CAN_sleep(bool sleep);
